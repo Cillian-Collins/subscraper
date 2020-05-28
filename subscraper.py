@@ -52,7 +52,19 @@ def find_scripts(url):
         There is a margin of error here but it's probably negligible in the bigger picture.
         '''
         if is_src(script_tag.attrs):
-            find_scripts(re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_tag.attrs['src']).group())
+            script_src = script_tag.attrs['src']
+            if script_src[0] == "/" and script_src[1] != "/":
+                parsed_url = url + script_src
+            elif script_src[0] == "/" and script_src[1] == "/":
+                parsed_url = script_src[2:]
+            elif "http" not in script_src:
+                parsed_url = url + "/" + script_src
+            else:
+                parsed_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
+            find_subdomains(requests.get('http://' + parsed_url).text)
+            src_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
+            if src_url not in SUBDOMAINS_ENUMERATED:
+                SUBDOMAINS_ENUMERATED.append(src_url)
         else:
             find_subdomains(script_tag)
 
@@ -122,6 +134,25 @@ def find_subdomains(script):
         for site in SUBDOMAINS_ENUMERATED:
             find_scripts(site)
 
+def ascii_banner():
+    ctext("                      `. ___", "red")
+    ctext("                    __,' __`.                _..----....____", "red")
+    ctext("        __...--.'``;.   ,.   ;``--..__     .'    ,-._    _.-'", "red")
+    ctext("  _..-''-------'   `'   `'   `'     O ``-''._   (,;') _,'", "red")
+    ctext(",'________________                          \`-._`-','", "red")
+    ctext(" `._              ```````````------...___   '-.._'-:", "red")
+    ctext("    ```--.._      ,.                     ````--...__\-.", "red")
+    ctext("            `.--. `-`                       ____    |  |`", "red")
+    ctext("              `. `.                       ,'`````.  ;  ;`", "red")
+    ctext("                `._`.        __________   `.      \'__/`", "red")
+    ctext("                   `-:._____/______/___/____`.     \  `", "red")
+    ctext("         SUBSCRAPER            |       `._    `.    \\", "red")
+    ctext("         SUBSCRAPER            `._________`-.   `.   `.___", "red")
+    ctext("         SUBSCRAPER                               `------'`", "red")
+
+
+# Banner
+ascii_banner()
 
 # Initiate user input
 find_scripts(args.u)
