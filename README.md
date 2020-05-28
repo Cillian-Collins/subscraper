@@ -25,11 +25,13 @@ pip install -r requirements.txt
 Syntax: 
     $ python subscraper.py -u youtube.com
     $ python subscraper.py -u youtube.com -o output.txt
+    $ python subscraper.py -u youtube.com -v
 
 Options:
   -h, --help  show this help message and exit
-  -u U        URL of the website to scan.
-  -o [O]      Output file (for results).
+  -u          URL of the website to scan.
+  -o          Output file (for results).
+  -v          Enables verbosity
 ```
 
 ## Contributions
