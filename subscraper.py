@@ -11,6 +11,7 @@ Usage: argparse.py -u website.com -o output.txt
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
 parser.add_argument('-u', help='URL of the website to scan.', required=True)
 parser.add_argument('-o', help='Output file (for results).', nargs="?")
+parser.add_argument('-v', help='Enables verbosity', action="store_true")
 args = parser.parse_args()
 
 '''
@@ -96,18 +97,21 @@ def find_subdomains(script):
             # If the subdomain is preceded by URL encoding, we removed it.
             parsed_subdomain = subdomain.split("%")[-1][2:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
-                ctext(parsed_subdomain, "green", "black")
+                if args.v:
+                    ctext(parsed_subdomain, "green", "black")
                 SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
         elif "\\x" in subdomain:
             # If the subdomain is preceded by \x escape sequence, remove it.
             parsed_subdomain = subdomain.split("\\x")[-1][2:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
-                ctext(parsed_subdomain, "green", "black")
+                if args.v:
+                    ctext(parsed_subdomain, "green", "black")
                 SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
         else:
             # Otherwise proceed as normal.
             if subdomain not in SUBDOMAINS_ENUMERATED:
-                ctext(subdomain, "green", "black")
+                if args.v:
+                    ctext(subdomain, "green", "black")
                 SUBDOMAINS_ENUMERATED.append(subdomain)
 
     '''
