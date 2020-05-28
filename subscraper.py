@@ -10,7 +10,6 @@ Usage: argparse.py -u website.com -o output.txt
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
 parser.add_argument('-u', help='URL of the website to scan.', required=True)
-# Output feature has not yet been added
 parser.add_argument('-o', help='Output file (for results).', nargs="?")
 args = parser.parse_args()
 
@@ -121,3 +120,6 @@ def find_subdomains(script):
 
 # Initiate user input
 find_scripts(args.u)
+if args.o:
+    with open(args.o, "w") as f:
+        f.write("".join(x + "\n" for x in SUBDOMAINS_ENUMERATED))
