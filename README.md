@@ -23,10 +23,11 @@ pip install -r requirements.txt
 
 ```
 Syntax: 
-    $ python subrake -u youtube.com
+    $ python subscraper.py -u youtube.com
+    $ python subscraper.py -u youtube.com -o output.txt
 
 Options:
-   optional arguments:
   -h, --help  show this help message and exit
   -u U        URL of the website to scan.
+  -o [O]      Output file (for results).
 ```
