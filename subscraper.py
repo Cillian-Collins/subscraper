@@ -10,8 +10,9 @@ Usage: argparse.py -u website.com -o output.txt
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
 parser.add_argument('-u', help='URL of the website to scan.', required=True)
-parser.add_argument('-o', help='Output file (for results).', nargs="?")
-parser.add_argument('-v', help='Enables verbosity', action="store_true")
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-o', help='Output file (for results).', nargs="?")
+group.add_argument('-v', help='Enables verbosity', action="store_true")
 args = parser.parse_args()
 
 '''
