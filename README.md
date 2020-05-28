@@ -22,10 +22,10 @@ pip install -r requirements.txt
 ## Parameters
 
 ```
-Syntax: 
-    $ python subscraper.py -u youtube.com
+Syntax:
     $ python subscraper.py -u youtube.com -o output.txt
     $ python subscraper.py -u youtube.com -v
+    $ python subscraper.py -u youtube.com -o output.txt -v
 
 Options:
   -h, --help  show this help message and exit
