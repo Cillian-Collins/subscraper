@@ -125,7 +125,7 @@ def find_subdomains(script):
                 SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
         elif "\\u" in subdomain:
             # If the subdomain is preceded by \u unicode sequence, remove it.
-            parsed_subdomain = subdomain.split("\\x")[-1][6:]
+            parsed_subdomain = subdomain.split("\\u")[-1][4:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
                 if args.v:
                     ctext("[+] " + parsed_subdomain, "green")
