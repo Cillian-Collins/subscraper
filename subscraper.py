@@ -3,6 +3,7 @@ import argparse
 import re
 from bs4 import BeautifulSoup
 from Color_Console import ctext
+import urllib3
 
 '''
 Usage: argparse.py -u website.com -o output.txt
@@ -26,6 +27,15 @@ Threading would be useful here for optimization purposes.
 SUBDOMAINS_ENUMERATED = []
 SITES_VISITED = []
 
+
+'''
+Define headers to send with Python requests.
+Some webservers will block requests with the default python-requests header. So, we should use something more browser-like.
+Add other headers as needed/desired.
+'''
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36'
+}
 
 '''
 Find scripts function will initiate the sequence by identifying all script tags on a given page.
@@ -61,8 +71,8 @@ def find_scripts(url):
                 parsed_url = url + "/" + script_src
             else:
                 parsed_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
-            find_subdomains(requests.get('http://' + parsed_url).text)
             try:
+                find_subdomains(requests.get('http://' + parsed_url, verify=False, headers=HEADERS).text)
                 src_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
                 if src_url not in SUBDOMAINS_ENUMERATED:
                     SUBDOMAINS_ENUMERATED.append(src_url)
@@ -94,7 +104,7 @@ It's very common for request errors so we simply ignore it.
 
 def is_live(url):
     try:
-        r = requests.get('http://' + str(url))
+        r = requests.get('http://' + str(url), verify=False, headers=HEADERS)
         return r
     except:
         return False
@@ -119,6 +129,13 @@ def find_subdomains(script):
         elif "\\x" in subdomain:
             # If the subdomain is preceded by \x escape sequence, remove it.
             parsed_subdomain = subdomain.split("\\x")[-1][2:]
+            if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
+                if args.v:
+                    ctext("[+] " + parsed_subdomain, "green")
+                SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
+        elif "\\u" in subdomain:
+            # If the subdomain is preceded by \u unicode sequence, remove it.
+            parsed_subdomain = subdomain.split("\\u")[-1][4:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
                 if args.v:
                     ctext("[+] " + parsed_subdomain, "green")
@@ -157,6 +174,9 @@ def ascii_banner():
 
 # Banner
 ascii_banner()
+
+# Suppress "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Initiate user input
 find_scripts(args.u)
