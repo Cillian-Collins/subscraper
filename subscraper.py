@@ -3,7 +3,6 @@ import argparse
 import re
 from bs4 import BeautifulSoup
 from Color_Console import ctext
-from unidecode import unidecode
 
 '''
 Usage: argparse.py -u website.com -o output.txt
