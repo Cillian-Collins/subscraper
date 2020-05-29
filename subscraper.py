@@ -62,9 +62,12 @@ def find_scripts(url):
             else:
                 parsed_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
             find_subdomains(requests.get('http://' + parsed_url).text)
-            src_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
-            if src_url not in SUBDOMAINS_ENUMERATED:
-                SUBDOMAINS_ENUMERATED.append(src_url)
+            try:
+                src_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
+                if src_url not in SUBDOMAINS_ENUMERATED:
+                    SUBDOMAINS_ENUMERATED.append(src_url)
+            except:
+                pass
         else:
             find_subdomains(script_tag)
 
@@ -111,20 +114,20 @@ def find_subdomains(script):
             parsed_subdomain = subdomain.split("%")[-1][2:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
                 if args.v:
-                    ctext(parsed_subdomain, "green", "black")
+                    ctext("[+] " + parsed_subdomain, "green")
                 SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
         elif "\\x" in subdomain:
             # If the subdomain is preceded by \x escape sequence, remove it.
             parsed_subdomain = subdomain.split("\\x")[-1][2:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
                 if args.v:
-                    ctext(parsed_subdomain, "green", "black")
+                    ctext("[+] " + parsed_subdomain, "green")
                 SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
         else:
             # Otherwise proceed as normal.
             if subdomain not in SUBDOMAINS_ENUMERATED:
                 if args.v:
-                    ctext(subdomain, "green", "black")
+                    ctext("[+] " + subdomain, "green")
                 SUBDOMAINS_ENUMERATED.append(subdomain)
 
     '''
@@ -148,7 +151,8 @@ def ascii_banner():
     ctext("                   `-:._____/______/___/____`.     \  `", "red")
     ctext("         SUBSCRAPER            |       `._    `.    \\", "red")
     ctext("         SUBSCRAPER            `._________`-.   `.   `.___", "red")
-    ctext("         SUBSCRAPER                               `------'`", "red")
+    ctext("         SUBSCRAPER                v1.0.0         `------'`", "red")
+    ctext("\nSubdomains Found:\n")
 
 
 # Banner
