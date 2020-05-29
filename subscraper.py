@@ -175,7 +175,7 @@ def ascii_banner():
 # Banner
 ascii_banner()
 
-# Surpress "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
+# Suppress "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Initiate user input
