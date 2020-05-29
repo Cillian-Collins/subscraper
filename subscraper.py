@@ -62,8 +62,8 @@ def find_scripts(url):
                 parsed_url = url + "/" + script_src
             else:
                 parsed_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
-            find_subdomains(requests.get('http://' + parsed_url).text)
             try:
+                find_subdomains(requests.get('http://' + parsed_url).text)
                 src_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
                 if src_url not in SUBDOMAINS_ENUMERATED:
                     SUBDOMAINS_ENUMERATED.append(src_url)
