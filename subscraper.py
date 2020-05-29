@@ -3,7 +3,8 @@ import argparse
 import re
 from bs4 import BeautifulSoup
 from Color_Console import ctext
-import urllib3
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 '''
 Usage: argparse.py -u website.com -o output.txt
