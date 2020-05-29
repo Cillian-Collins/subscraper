@@ -1,6 +1,7 @@
 import requests
 import argparse
 import re
+import urllib3
 from bs4 import BeautifulSoup
 from Color_Console import ctext
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
