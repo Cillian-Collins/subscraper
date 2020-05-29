@@ -3,6 +3,7 @@ import argparse
 import re
 from bs4 import BeautifulSoup
 from Color_Console import ctext
+from unidecode import unidecode
 
 '''
 Usage: argparse.py -u website.com -o output.txt
@@ -119,6 +120,13 @@ def find_subdomains(script):
         elif "\\x" in subdomain:
             # If the subdomain is preceded by \x escape sequence, remove it.
             parsed_subdomain = subdomain.split("\\x")[-1][2:]
+            if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
+                if args.v:
+                    ctext("[+] " + parsed_subdomain, "green")
+                SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
+        elif "\\u" in subdomain:
+            # If the subdomain is preceded by \u unicode sequence, remove it.
+            parsed_subdomain = subdomain.split("\\x")[-1][6:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
                 if args.v:
                     ctext("[+] " + parsed_subdomain, "green")
