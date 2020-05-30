@@ -6,9 +6,11 @@ from bs4 import BeautifulSoup
 from Color_Console import ctext
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
 '''
 Usage: argparse.py -u website.com -o output.txt
 '''
+
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
 parser.add_argument('-u', help='URL of the website to scan.', required=True)
@@ -27,16 +29,10 @@ Threading would be useful here for optimization purposes.
 
 SUBDOMAINS_ENUMERATED = []
 SITES_VISITED = []
-
-
-'''
-Define headers to send with Python requests.
-Some webservers will block requests with the default python-requests header. So, we should use something more browser-like.
-Add other headers as needed/desired.
-'''
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36'
 }
+
 
 '''
 Find scripts function will initiate the sequence by identifying all script tags on a given page.
@@ -121,6 +117,9 @@ def find_subdomains(script):
     subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + args.u, str(script))
     for subdomain in subdomain_regex:
         if "%" in subdomain:
+            # Sort for double URL encoding
+            while "%25" in subdomain:
+                subdomain = subdomain.replace("%25", "%")
             # If the subdomain is preceded by URL encoding, we removed it.
             parsed_subdomain = subdomain.split("%")[-1][2:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
@@ -128,6 +127,7 @@ def find_subdomains(script):
                     ctext("[+] " + parsed_subdomain, "green")
                 SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
         elif "\\x" in subdomain:
+            ctext("[+] " + subdomain, "red")
             # If the subdomain is preceded by \x escape sequence, remove it.
             parsed_subdomain = subdomain.split("\\x")[-1][2:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
@@ -135,6 +135,7 @@ def find_subdomains(script):
                     ctext("[+] " + parsed_subdomain, "green")
                 SUBDOMAINS_ENUMERATED.append(parsed_subdomain)
         elif "\\u" in subdomain:
+            ctext("[+] " + subdomain, "red")
             # If the subdomain is preceded by \u unicode sequence, remove it.
             parsed_subdomain = subdomain.split("\\u")[-1][4:]
             if parsed_subdomain not in SUBDOMAINS_ENUMERATED:
