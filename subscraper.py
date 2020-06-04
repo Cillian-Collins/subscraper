@@ -35,6 +35,7 @@ Find scripts function will initiate the sequence by identifying all script tags 
 From there it enumerates a list, sorts it for duplicates and then passes the script content to find_subdomains function.
 '''
 
+
 def find_scripts(url):
     # If we already checked the site, ignore it.
     if url in SITES_VISITED:
@@ -83,13 +84,18 @@ def find_scripts(url):
 
 # you can simply check to see if the dictionary has a key
 # you should also verify it is a dictionary
+
+
 def is_src(tag):
     return isinstance(tag, dict) and 'src' in tag
+
 
 '''
 Here we will use another function to capture errors in our requests.
 It's very common for request errors so we simply ignore it.
 '''
+
+
 def is_live(url):
     try:
         r = requests.get('http://' + str(url), verify=False, headers=HEADERS)
@@ -137,6 +143,7 @@ def find_subdomains(script):
         for site in SUBDOMAINS_ENUMERATED:
             find_scripts(site)
 
+
 def ascii_banner():
     ctext("                      `. ___", "red")
     ctext("                    __,' __`.                _..----....____", "red")
@@ -166,6 +173,6 @@ def main():
         with open(args.o, "w") as f:
             f.write("".join(x + "\n" for x in SUBDOMAINS_ENUMERATED))
 
+
 if __name__ == '__main__':
     main()
-
