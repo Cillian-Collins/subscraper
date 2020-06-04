@@ -48,19 +48,13 @@ def find_scripts(url):
     soup = BeautifulSoup(r.text, 'lxml')
     script_tags = soup.find_all('script')
 
-    i = 0
-    total_script_count = len(script_tags)
-
-    #for script_tag in script_tags:
-    while i < total_script_count:
+    for script_tag in script_tags:
         '''
         Here we need to account for relative URLs and many other types of CDNs.
         We should also take into account that files hosted on other websites can usually be omitted.
         As such we will omit these in order to prevent us falling into a rabbit hole of requests.
         There is a margin of error here but it's probably negligible in the bigger picture.
         '''
-        print(f"Processing script {i} of {total_script_count}...")
-        script_tag = script_tags[i]
         if is_src(script_tag.attrs):
             script_src = script_tag.attrs['src']
             if script_src[0] == "/" and script_src[1] != "/":
@@ -80,7 +74,6 @@ def find_scripts(url):
                 pass
         else:
             find_subdomains(script_tag)
-        i+=1
 
 # you can simply check to see if the dictionary has a key
 # you should also verify it is a dictionary
