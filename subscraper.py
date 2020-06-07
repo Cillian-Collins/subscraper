@@ -1,14 +1,16 @@
-import requests
+#!/usr/bin/env python3
 import argparse
 import re
+import requests
 import urllib3
+
 from bs4 import BeautifulSoup
 from Color_Console import ctext
+
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-"""
-Usage: argparse.py -u website.com -o output.txt
-"""
+# Usage: argparse.py -u website.com -o output.txt
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
 parser.add_argument('-u', help='URL of the website to scan.', required=True)
@@ -151,7 +153,7 @@ def ascii_banner():
 def main():
     # Banner
     ascii_banner()
-    # Suppress "Insecuould also take intoreRequestWarning: Unverified HTTPS request is being made" warnings
+    # Suppress InsecureRequestWarning
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # Initiate user input
     find_scripts(args.u)
