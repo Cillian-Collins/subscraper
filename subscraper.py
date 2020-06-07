@@ -143,7 +143,7 @@ def ascii_banner():
     ctext("            `.--. `-`                       ____    |  |`", "red")
     ctext("              `. `.                       ,'`````.  ;  ;`", "red")
     ctext("                `._`.        __________   `.      \'__/`", "red")
-    ctext("                   `-:._____/______/___/____`.     \  `", "red")
+    ctext("                   `-:._____/______/___/____`.     \\  `", "red")
     ctext("         SUBSCRAPER            |       `._    `.    \\", "red")
     ctext("         SUBSCRAPER            `._________`-.   `.   `.___", "red")
     ctext("         SUBSCRAPER                v1.0.0         `------'`", "red")
