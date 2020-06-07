@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup
 from Color_Console import ctext
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-'''
+"""
 Usage: argparse.py -u website.com -o output.txt
-'''
+"""
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
 parser.add_argument('-u', help='URL of the website to scan.', required=True)
@@ -17,12 +17,12 @@ group.add_argument('-o', help='Output file (for results).', nargs="?")
 group.add_argument('-v', help='Enables verbosity', action="store_true")
 args = parser.parse_args()
 
-'''
+"""
 We define subdomains enumerated and sites visited in order to compare both lists.
 We can thus determine which subdomains have not yet been checked.
 This 'domino effect' of subsequent requests yields much more subdomains than scanning only the front page.
 Threading would be useful here for optimization purposes.
-'''
+"""
 
 SUBDOMAINS_ENUMERATED = []
 SITES_VISITED = []
@@ -30,10 +30,10 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36'
 }
 
-'''
+"""
 Find scripts function will initiate the sequence by identifying all script tags on a given page.
 From there it enumerates a list, sorts it for duplicates and then passes the script content to find_subdomains function.
-'''
+"""
 
 
 def find_scripts(url):
@@ -49,12 +49,12 @@ def find_scripts(url):
     script_tags = soup.find_all('script')
 
     for script_tag in script_tags:
-        '''
+        """
         Here we need to account for relative URLs and many other types of CDNs.
-        We should also take into account that files hosted on other websites can usually be omitted.
+        We sh account that files hosted on other websites can usually be omitted.
         As such we will omit these in order to prevent us falling into a rabbit hole of requests.
         There is a margin of error here but it's probably negligible in the bigger picture.
-        '''
+        """
         if is_src(script_tag.attrs):
             script_src = script_tag.attrs['src']
             if script_src[0] == "/" and script_src[1] != "/":
@@ -75,21 +75,19 @@ def find_scripts(url):
         else:
             find_subdomains(script_tag)
 
-# you can simply check to see if the dictionary has a key
-# you should also verify it is a dictionary
-
 
 def is_src(tag):
+    """
+    Checks if dictionary has key and verifies that it is a dictionary.
+    """
     return isinstance(tag, dict) and 'src' in tag
 
 
-'''
-Here we will use another function to capture errors in our requests.
-It's very common for request errors so we simply ignore it.
-'''
-
-
 def is_live(url):
+    """
+    Here we will use another function to capture errors in our requests.
+    It's very common for request errors so we simply ignore it.
+    """
     try:
         r = requests.get('http://' + str(url), verify=False, headers=HEADERS)
         return r
@@ -97,16 +95,13 @@ def is_live(url):
         return False
 
 
-'''
-Once we have our list of javascript code, we must find all subdomains in the code.
-As such, we compare it to a regex and then sort for the various exceptions one might expect to find.
-'''
-
-
 def find_subdomains(script):
+    """
+    Once we have our list of javascript code, we must find all subdomains in the code.
+    As such, we compare it to a regex and then sort for the various exceptions one might expect to find.
+    """
     subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + args.u, str(script))
     for subdomain in subdomain_regex:
-        parsed_subdomain = ""
         # If the subdomain is preceded by URL encoding, we removed it.
         if "%" in subdomain:
             # Sort for double URL encoding
@@ -129,9 +124,7 @@ def find_subdomains(script):
                 ctext("[+] " + subdomain, "green")
             SUBDOMAINS_ENUMERATED.append(subdomain)
 
-    '''
-    If our total subdomains discovered is not the same length as our sites visited, scan the rest of our subdomains.
-    '''
+    # If our total subdomains discovered is not the same length as our sites visited, scan the rest of our subdomains.
     if len(list(set(SUBDOMAINS_ENUMERATED))) != len(list(set(SITES_VISITED))):
         for site in SUBDOMAINS_ENUMERATED:
             find_scripts(site)
@@ -158,7 +151,7 @@ def ascii_banner():
 def main():
     # Banner
     ascii_banner()
-    # Suppress "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
+    # Suppress "Insecuould also take intoreRequestWarning: Unverified HTTPS request is being made" warnings
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # Initiate user input
     find_scripts(args.u)
