@@ -13,7 +13,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Usage: argparse.py -u website.com -o output.txt
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
-parser.add_argument('-u', help='URL of the website to scan.', required=True)
+parser.add_argument('-u', help='URL of the website to scan.')
+parser.add_argument('-f', help='File with a list of the URLs to scan.')
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-o', help='Output file (for results).', nargs="?")
 group.add_argument('-v', help='Enables verbosity', action="store_true")
@@ -156,7 +157,21 @@ def main():
     # Suppress InsecureRequestWarning
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # Initiate user input
-    find_scripts(args.u)
+    
+    # Read URL list from provided path
+    if(args.f):
+        url_list = open(args.f,"r")
+        for URL in url_list.readlines():
+            find_scripts(URL.strip())
+            
+    # Read URL from argument
+    elif args.u:
+        find_scripts(args.u)
+        
+    # If neither provided, throw error    
+    elif args.u == False and args.f == False:
+        raise Exception("URL must be set with either the -u or -f flags")
+        
     if args.o:
         with open(args.o, "w") as f:
             f.write("".join(x + "\n" for x in SUBDOMAINS_ENUMERATED))
