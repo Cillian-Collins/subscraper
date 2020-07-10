@@ -13,8 +13,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Usage: argparse.py -u website.com -o output.txt
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
-parser.add_argument('-u', help='URL of the website to scan.')
-parser.add_argument('-f', help='File with a list of the URLs to scan.')
+parser.add_argument('-u', help='URL of the website to scan.', required=True)
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-o', help='Output file (for results).', nargs="?")
 group.add_argument('-v', help='Enables verbosity', action="store_true")
@@ -76,7 +75,7 @@ def find_scripts(url):
             except:
                 pass
         else:
-            find_subdomains(script_tag, url)
+            find_subdomains(script_tag)
 
 
 def is_src(tag):
@@ -98,12 +97,12 @@ def is_live(url):
         return False
 
 
-def find_subdomains(script, url):
+def find_subdomains(script):
     """
     Once we have our list of javascript code, we must find all subdomains in the code.
     As such, we compare it to a regex and then sort for the various exceptions one might expect to find.
     """
-    subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + url, str(script))
+    subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + args.u, str(script))
     for subdomain in subdomain_regex:
         # If the subdomain is preceded by URL encoding, we removed it.
         if "%" in subdomain:
@@ -157,21 +156,7 @@ def main():
     # Suppress InsecureRequestWarning
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # Initiate user input
-    
-    # Read URL list from provided path
-    if args.f:
-        url_list = open(args.f,"r")
-        for URL in url_list.readlines():
-            find_scripts(URL.strip())
-            
-    # Read URL from argument
-    elif args.u:
-        find_scripts(args.u)
-        
-    # If neither provided, throw error    
-    else:
-        raise Exception("URL must be set with either the -u or -f flags")
-        
+    find_scripts(args.u)
     if args.o:
         with open(args.o, "w") as f:
             f.write("".join(x + "\n" for x in SUBDOMAINS_ENUMERATED))
