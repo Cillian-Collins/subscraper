@@ -76,7 +76,7 @@ def find_scripts(url):
             except:
                 pass
         else:
-            find_subdomains(script_tag)
+            find_subdomains(script_tag, url)
 
 
 def is_src(tag):
@@ -98,12 +98,12 @@ def is_live(url):
         return False
 
 
-def find_subdomains(script):
+def find_subdomains(script, url):
     """
     Once we have our list of javascript code, we must find all subdomains in the code.
     As such, we compare it to a regex and then sort for the various exceptions one might expect to find.
     """
-    subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + args.u, str(script))
+    subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + url, str(script))
     for subdomain in subdomain_regex:
         # If the subdomain is preceded by URL encoding, we removed it.
         if "%" in subdomain:
@@ -159,7 +159,7 @@ def main():
     # Initiate user input
     
     # Read URL list from provided path
-    if(args.f):
+    if args.f:
         url_list = open(args.f,"r")
         for URL in url_list.readlines():
             find_scripts(URL.strip())
@@ -169,7 +169,7 @@ def main():
         find_scripts(args.u)
         
     # If neither provided, throw error    
-    elif args.u == False and args.f == False:
+    else:
         raise Exception("URL must be set with either the -u or -f flags")
         
     if args.o:
