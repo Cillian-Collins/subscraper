@@ -13,7 +13,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Usage: argparse.py -u website.com -o output.txt
 
 parser = argparse.ArgumentParser(description='Extract subdomains from javascript files.')
-parser.add_argument('-u', help='URL of the website to scan.', required=True)
+parser.add_argument('-u', help='URL of the website to scan.')
+parser.add_argument('-f', help='File with a list of the URLs to scan.')
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-o', help='Output file (for results).', nargs="?")
 group.add_argument('-v', help='Enables verbosity', action="store_true")
@@ -68,14 +69,14 @@ def find_scripts(url):
             else:
                 parsed_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
             try:
-                find_subdomains(requests.get('http://' + parsed_url, verify=False, headers=HEADERS).text)
+                find_subdomains(requests.get('http://' + parsed_url, verify=False, headers=HEADERS).text, url)
                 src_url = re.search("[a-zA-Z0-9-_.]+\.[a-zA-Z]{2,}", script_src).group()
                 if src_url not in SUBDOMAINS_ENUMERATED:
                     SUBDOMAINS_ENUMERATED.append(src_url)
             except:
                 pass
         else:
-            find_subdomains(script_tag)
+            find_subdomains(script_tag, url)
 
 
 def is_src(tag):
@@ -97,12 +98,12 @@ def is_live(url):
         return False
 
 
-def find_subdomains(script):
+def find_subdomains(script, url):
     """
     Once we have our list of javascript code, we must find all subdomains in the code.
     As such, we compare it to a regex and then sort for the various exceptions one might expect to find.
     """
-    subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + args.u, str(script))
+    subdomain_regex = re.findall(r"[%\\]?[a-zA-Z0-9][a-zA-Z0-9-_.]*\." + url, str(script))
     for subdomain in subdomain_regex:
         # If the subdomain is preceded by URL encoding, we removed it.
         if "%" in subdomain:
@@ -156,7 +157,21 @@ def main():
     # Suppress InsecureRequestWarning
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # Initiate user input
-    find_scripts(args.u)
+    
+    # Read URL list from provided path
+    if args.f:
+        url_list = open(args.f,"r")
+        for URL in url_list.readlines():
+            find_scripts(URL.strip())
+            
+    # Read URL from argument
+    elif args.u:
+        find_scripts(args.u)
+        
+    # If neither provided, throw error    
+    else:
+        raise Exception("URL must be set with either the -u or -f flags")
+        
     if args.o:
         with open(args.o, "w") as f:
             f.write("".join(x + "\n" for x in SUBDOMAINS_ENUMERATED))
